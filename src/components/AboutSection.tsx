@@ -1,11 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import profileImage from '../assets/profile1.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const AboutSection = () => {
+const AboutSection = memo(() => {
   const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -16,7 +16,7 @@ const AboutSection = () => {
       // Image animation
       gsap.fromTo(
         imageRef.current,
-        { opacity: 0, x: -60, scale: 0.9, rotation: -5 },
+        { opacity: 0, x: -60, scale: 0.9, rotation: -5, willChange: 'opacity, transform' },
         {
           opacity: 1,
           x: 0,
@@ -32,15 +32,14 @@ const AboutSection = () => {
         }
       );
 
-      // Content animation (optimized - no blur filter)
+      // Content animation
       gsap.fromTo(
-        contentRef.current?.children || [],
-        { opacity: 0, y: 40 },
+        contentRef.current,
+        { opacity: 0, y: 40, willChange: 'opacity, transform' },
         {
           opacity: 1,
           y: 0,
           duration: 0.7,
-          stagger: 0.15,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: contentRef.current,
@@ -50,10 +49,10 @@ const AboutSection = () => {
         }
       );
 
-      // Skills animation
+      // Skills / floating elements animation
       gsap.fromTo(
         skillsRef.current?.children || [],
-        { opacity: 0, y: 20, scale: 0.95 },
+        { opacity: 0, y: 20, scale: 0.95, willChange: 'opacity, transform' },
         {
           opacity: 1,
           y: 0,
@@ -74,25 +73,21 @@ const AboutSection = () => {
   }, []);
 
   return (
-    <section
-      id="about"
-      ref={sectionRef}
-      className="py-20 lg:py-32 relative overflow-hidden"
-    >
-      {/* Background Effects */}
-      <div className="absolute inset-0 grid-bg opacity-5" />
+    <section id="about" ref={sectionRef} className="py-20 lg:py-32 relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 grid-bg opacity-5 pointer-events-none" />
       <div className="floating-orb w-40 h-40 top-20 right-10 opacity-10" />
 
       <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Image */}
           <div ref={imageRef} className="relative flex justify-center">
-            <div className="relative w-96 h-[650px] mt-16">
-              {/* Glow effect behind image */}
+            <div className="relative w-96 h-[650px] mt-16 will-change-transform">
+              {/* Glow behind image */}
               <div className="absolute inset-0 bg-gradient-primary rounded-2xl blur-3xl opacity-25 animate-pulse-glow" />
 
-              {/* Image container */}
-              <div className="relative glass-card p-6 rounded-2xl overflow-hidden group shadow-2xl translate-y-28">
+              {/* Image card */}
+              <div className="relative glass-card p-6 rounded-2xl overflow-hidden group shadow-2xl translate-y-28 will-change-transform">
                 <img
                   src={profileImage}
                   alt="Hardik Rangucha - Cloud & DevOps Engineer"
@@ -100,18 +95,17 @@ const AboutSection = () => {
                   className="w-full h-full object-cover rounded-2xl transform transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1"
                 />
 
-                {/* Hover overlay */}
                 <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-15 transition-opacity duration-500 rounded-2xl" />
               </div>
 
-              {/* Floating elements around image */}
+              {/* Floating elements */}
               <div className="absolute -top-8 -right-8 w-10 h-10 bg-primary rotate-45 transform animate-float" />
               <div className="absolute -bottom-4 -left-8 w-12 h-12 bg-accent rounded-lg animate-float delay-500" />
             </div>
           </div>
 
           {/* Content */}
-          <div ref={contentRef} className="space-y-8">
+          <div ref={contentRef} className="space-y-8 will-change-transform">
             <div className="space-y-6">
               <div className="space-y-2">
                 <p className="text-primary font-medium uppercase tracking-wider text-sm">
@@ -130,19 +124,17 @@ const AboutSection = () => {
                   I’m <span className="font-medium text-foreground">Hardik Rangucha</span>, an aspiring
                   <span className="text-primary"> Cloud & DevOps Engineer</span> with a strong foundation in
                   <span className="font-medium"> cybersecurity</span>. I recently completed my
-                  <span className="font-medium"> Masters in Information Technology</span>, where I focused on building
+                  <span className="font-medium"> Masters in Information Technology</span>, focusing on building
                   secure, scalable, and efficient systems.
                 </p>
                 <p>
                   My journey started with a deep interest in <span className="font-medium">cloud technologies,
                   automation, and infrastructure security</span>. I’ve worked on hands-on projects involving
-                  <span className="font-medium"> AWS, Docker, Kubernetes, CI/CD pipelines, and monitoring tools</span>,
-                  giving me practical exposure to how modern systems are built and maintained.
+                  <span className="font-medium"> AWS, Docker, Kubernetes, CI/CD pipelines, and monitoring tools</span>.
                 </p>
                 <p>
-                  Beyond the technical side, I enjoy solving problems, exploring new tools, and continuously
-                  learning. Whether it’s setting up cloud infrastructure, streamlining DevOps workflows, or
-                  ensuring systems are secure, I’m always excited to take on new challenges.
+                  Beyond technical skills, I enjoy solving problems, exploring new tools, and continuously
+                  learning. I’m always excited to take on new challenges.
                 </p>
                 <p>
                   Outside of work, I like exploring emerging technologies, contributing to personal projects, and
@@ -155,6 +147,6 @@ const AboutSection = () => {
       </div>
     </section>
   );
-};
+});
 
 export default AboutSection;
